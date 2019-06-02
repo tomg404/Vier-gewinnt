@@ -1,5 +1,5 @@
-from game import Game
+from src.game import Game
 
 # use True for more output
-g = Game(False)
+g = Game(True)
 g.run()

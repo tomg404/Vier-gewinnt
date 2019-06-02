@@ -1,4 +1,5 @@
 import os
+import numpy as np
 
 class Game:
     def __init__(self, verbose):
@@ -13,15 +14,15 @@ class Game:
                     [self.empty,self.empty,self.empty,self.empty,self.empty,self.empty,self.empty],
                     [self.empty,self.empty,self.empty,self.empty,self.empty,self.empty,self.empty],
                     [self.empty,self.empty,self.empty,self.empty,self.empty,self.empty,self.empty]]
-        self.verbose = False
+        self.verbose = verbose
 
     def run(self):
         won = False
         while True:
-            self.clear_screen()
             self.print_field()
             self.get_user_input()
             self.insert()
+            self.clear_screen()
             won = self.check_win()
             if won:
                 self.print_field()
@@ -96,31 +97,29 @@ class Game:
         # linear check
         for i in range(0, 6):
             # converts array into string (e.g. ['x','x','x'] -> xxx)
-            win_row = str(self.field[i]).replace(",","").replace("'","").replace("[","").replace("]","")
+            win_row = str(self.field[i]).replace(",","").replace("'","").replace("[","").replace("]","").replace(" ", ".")
 
             # checks if 4 same characters are in a row
-            if 4 * (self.player1 + " ") in win_row:
+            if 3*(self.player1 + ".")+self.player1 in win_row:
                 print("Player 1 won")
                 return True
-            elif 4 * (self.player2 + " ") in win_row:
+            elif 3*(self.player2 + ".")+self.player2 in win_row:
                 print("Player 2 won")
                 return True
 
     def _check_win_vertical(self):
         # vertical check
-        win_col = ""
+        win_arr = np.array(self.field)
         for col in range(0, 7):
-            for row in range(0, 6):
-                win_col += str(self.field[row][col]).replace("',","").replace("[","").replace("]","").replace(" ", "").replace("'", "")
-
-            # checks for every "win-string" if it contains 4 of the same chars
-            if 4 * self.player1 in win_col:
+            #                [:,col]  get first item from every list
+            win_col = str(win_arr[:,col]).replace(",","").replace("'","").replace("[","").replace("]","").replace(" ", ".")
+            # checks for every "win_col" if it contains 4 of the same chars
+            if 3*(self.player1+".")+self.player1 in win_col:
                 print("Player 1 won")
                 return True
-            elif 4 * self.player2 in win_col:
+            elif 3*(self.player2+".")+self.player2 in win_col:
                 print("Player 2 won")
                 return True
-
             # reset win_col
             win_col = ""
 
