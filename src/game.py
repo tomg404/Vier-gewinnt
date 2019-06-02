@@ -100,10 +100,10 @@ class Game:
             win_row = str(self.field[i]).replace(",","").replace("'","").replace("[","").replace("]","").replace(" ", ".")
 
             # checks if 4 same characters are in a row
-            if 3*(self.player1 + ".")+self.player1 in win_row:
+            if (3*(self.player1 + ".")+self.player1) in win_row:
                 print("Player 1 won")
                 return True
-            elif 3*(self.player2 + ".")+self.player2 in win_row:
+            elif (3*(self.player2 + ".")+self.player2) in win_row:
                 print("Player 2 won")
                 return True
 
