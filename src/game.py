@@ -84,7 +84,7 @@ class Game:
         d = self._check_win_diagonal()
 
         if self.verbose == True:
-            print("Linear check: %s" % l)
+            print("  Linear check: %s" % l)
             print("Vertical check: %s" % v)
             print("Diagonal check: %s" % d)
 
@@ -107,6 +107,8 @@ class Game:
                 print("Player 2 won")
                 return True
 
+        return False
+
     def _check_win_vertical(self):
         # vertical check
         win_arr = np.array(self.field)
@@ -122,6 +124,8 @@ class Game:
                 return True
             # reset win_col
             win_col = ""
+
+        return False
 
     def _check_win_diagonal(self):
         # diagonal check
@@ -184,3 +188,5 @@ class Game:
                             matching = 1
                     except:
                         pass
+
+            return False

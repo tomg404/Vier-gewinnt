@@ -4,15 +4,17 @@ import random
 
 game = Game_ai(True)
 won = False
+turns = 0   # count turns
 
 while True:
     game.print_field()
+    print('Turns: ', turns)
     if game.current_player == 2:
 
         current_field = game.get_field()
         last_input = game.get_last_user_input()
 
-        ai = Ai(current_field, last_input)
+        ai = Ai(current_field, last_input, turns)
         column = ai.calculate()
         game.get_user_input(column)
 
@@ -25,3 +27,5 @@ while True:
     if won == True:
         game.print_field()
         break
+    # increase turn counter
+    turns += 1
