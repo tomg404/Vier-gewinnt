@@ -1,10 +1,11 @@
 import os
 import argparse
 import numpy as np
+from . import __version__, __author__
 
 class Game:
     def __init__(self):
-        self.version = '1.1'
+        self.version = __version__
         self.empty = ' '
         self.player1 = 'X'
         self.player2 = 'O'
@@ -19,7 +20,7 @@ class Game:
         self.verbose = self.parse_args().verbose
 
     def parse_args(self):
-        parser = argparse.ArgumentParser(description='4 connects game in python')
+        parser = argparse.ArgumentParser(description='4 connects game in python', epilog='(c) %s'%__author__)
         parser.add_argument('-v', '--verbose', action='store_true', help='show which win check triggered on win')
         args = parser.parse_args()
         return args
