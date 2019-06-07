@@ -137,12 +137,10 @@ class Game:
         return False
 
     def _check_win_diagonal(self):
-            # convert array to numpy array
-            win_arr = np.array(self.field)
-
-            # check every diagonal if there are 4 of the same
+        # function for checking the array
+        def check_array(array):
             for col in range(0, 7):
-                win_diag = np.diagonal(win_arr, col)
+                win_diag = np.diagonal(array, col)
                 if len(win_diag) < 4:
                     pass
                 else:
@@ -156,22 +154,28 @@ class Game:
                     except KeyError:
                         pass
 
-            # flip array and again check every diagonal if there are 4 of the same
-            win_arr = np.fliplr(win_arr)
-            for col in range(0, 7):
-                win_diag = np.diagonal(win_arr, col)
-                if len(win_diag) < 4:
-                    pass
-                else:
-                    win_diag, counts = np.unique(win_diag, return_counts=True)
-                    win_dict = dict(zip(win_diag, counts))
-                    try:
-                        if win_dict[self.player1] == 4:
-                            return True
-                        elif win_dict[self.player2] == 4:
-                            return True
-                    except KeyError:
-                        pass
+        # convert array to numpy array
+        win_arr = np.array(self.field)
 
-            # if there are no matching chars return False
-            return False
+        # check every diagonal from up to down if there are 4 of the same
+        if check_array(win_arr):
+            return True
+
+        # flip array and again check every diagonal if there are 4 of the same
+        win_arr = np.fliplr(win_arr)
+        if check_array(win_arr):
+            return True
+
+        # flip array upside down
+        win_arr = np.flipud(win_arr)
+        if check_array(win_arr):
+            return True
+
+        # flip array left to right again
+        win_arr = np.fliplr(win_arr)
+        if check_array(win_arr):
+            return True
+
+
+        # if there are no matching chars return False
+        return False
