@@ -19,7 +19,6 @@ class Game_ai(Game):
             print("AI is on the turn")
             time.sleep(0.5)
             self.user_input = ai
-            
         else:
             try:
                 self.user_input = int(input('Choose column Player {}: '.format(self.current_player)))
