@@ -14,7 +14,7 @@ python3 run.py
 
 - Get verbose output:
 ```
-python3 run.py -v # for verbose output
+python3 run.py -v
 ```
 
 ## Screenshots
