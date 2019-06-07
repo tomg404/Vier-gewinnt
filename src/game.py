@@ -1,4 +1,5 @@
 import os
+import sys
 import argparse
 import numpy as np
 from . import __version__, __author__
@@ -28,14 +29,19 @@ class Game:
     def run(self):
         won = False
         while True:
-            self.print_field()
-            self.get_user_input()
-            self.insert()
-            self.clear_screen()
-            won = self.check_win()
-            if won:
+            try:
                 self.print_field()
-                break
+                self.get_user_input()
+                self.insert()
+                self.clear_screen()
+                won = self.check_win()
+                if won:
+                    self.print_field()
+                    print('You won!')
+                    break
+            except KeyboardInterrupt:
+                print('Game ended')
+                sys.exit()
 
     def print_field(self):
         print('4 Connects (v%s) (c) Tom Gaimann 2019' % self.version)
@@ -50,7 +56,8 @@ class Game:
             print('Invalid input. Try again!')
             self.get_user_input()
 
-        if self.user_input > 6 or self.user_input < -7:
+        # check if user input exceeds value and if the top field is not empty
+        if self.user_input > 6 or self.user_input < -7 or self.field[0][self.user_input] != self.empty:
             print('Invalid input. Try again!')
             self.get_user_input()
 
