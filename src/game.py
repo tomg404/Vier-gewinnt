@@ -1,8 +1,10 @@
 import os
+import argparse
 import numpy as np
 
 class Game:
-    def __init__(self, verbose):
+    def __init__(self):
+        self.version = '1.1'
         self.empty = ' '
         self.player1 = 'X'
         self.player2 = 'O'
@@ -14,7 +16,13 @@ class Game:
                     [self.empty,self.empty,self.empty,self.empty,self.empty,self.empty,self.empty],
                     [self.empty,self.empty,self.empty,self.empty,self.empty,self.empty,self.empty],
                     [self.empty,self.empty,self.empty,self.empty,self.empty,self.empty,self.empty]]
-        self.verbose = verbose
+        self.verbose = self.parse_args().verbose
+
+    def parse_args(self):
+        parser = argparse.ArgumentParser(description='4 connects game in python')
+        parser.add_argument('-v', '--verbose', action='store_true', help='show which win check triggered on win')
+        args = parser.parse_args()
+        return args
 
     def run(self):
         won = False
@@ -29,7 +37,7 @@ class Game:
                 break
 
     def print_field(self):
-        print()
+        print('4 Connects (v%s) (c) Tom Gaimann 2019' % self.version)
         print('|0|1|2|3|4|5|6|')
         for i in range(0, 6):
             print('|{}|{}|{}|{}|{}|{}|{}|'.format(self.field[i][0],self.field[i][1],self.field[i][2],self.field[i][3],self.field[i][4],self.field[i][5],self.field[i][6]))
@@ -128,65 +136,41 @@ class Game:
         return False
 
     def _check_win_diagonal(self):
-        # diagonal check
-        # explanation: the algorithm searches from a field in a radius of 4 every possible field.
-        #              if the algorithm finds 4 matching characters in a row it returns true (ends the program)
-        win_diag = ""
-        f = self.field
-        matching = 1
-        for col in range(0,7):
-            for row in range(0,6):
-                for n in range(1,5):
+            # convert array to numpy array
+            win_arr = np.array(self.field)
+
+            # check every diagonal if there are 4 of the same
+            for col in range(0, 7):
+                win_diag = np.diagonal(win_arr, col)
+                if len(win_diag) < 4:
+                    pass
+                else:
+                    win_diag, counts = np.unique(win_diag, return_counts=True)
+                    win_dict = dict(zip(win_diag, counts))
                     try:
-                        # if statement for player 1 up right check
-                        if f[row][col] == self.player1 and f[row][col] == f[row-n][col+n]:
-                            #print('found match:', row, col, 'and', row-n, col+n)
-                            matching += 1   # increments the match counter
-                        elif matching == 4:
-                            print("Player 1 won")
+                        if win_dict[self.player1] == 4:
                             return True
-                        else:
-                            matching = 1    # reset the match counter
-                    except:
-                        pass
-                #########################################################
-                for n in range(1,5):
-                    try:
-                        # if statement for player 2 up right check
-                        if f[row][col] == self.player2 and f[row][col] == f[row-n][col+n]:
-                            matching += 1
-                        elif matching == 4:
-                            print("Player 2 won")
+                        elif win_dict[self.player2] == 4:
                             return True
-                        else:
-                            matching = 1
-                    except:
-                        pass
-                #########################################################
-                for n in range(1,5):
-                    try:
-                        # if statement for player 2 up right check
-                        if f[row][col] == self.player1 and f[row][col] == f[row-n][col-n]:
-                            matching += 1
-                        elif matching == 4:
-                            print("Player 1 won")
-                            return True
-                        else:
-                            matching = 1
-                    except:
-                        pass
-                #########################################################
-                for n in range(1,5):
-                    try:
-                        # if statement for player 2 up right check
-                        if f[row][col] == self.player2 and f[row][col] == f[row-n][col-n]:
-                            matching += 1
-                        elif matching == 4:
-                            print("Player 2 won")
-                            return True
-                        else:
-                            matching = 1
-                    except:
+                    except KeyError:
                         pass
 
+            # flip array and again check every diagonal if there are 4 of the same
+            win_arr = np.fliplr(win_arr)
+            for col in range(0, 7):
+                win_diag = np.diagonal(win_arr, col)
+                if len(win_diag) < 4:
+                    pass
+                else:
+                    win_diag, counts = np.unique(win_diag, return_counts=True)
+                    win_dict = dict(zip(win_diag, counts))
+                    try:
+                        if win_dict[self.player1] == 4:
+                            return True
+                        elif win_dict[self.player2] == 4:
+                            return True
+                    except KeyError:
+                        pass
+
+            # if there are no matching chars return False
             return False
