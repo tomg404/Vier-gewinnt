@@ -2,7 +2,7 @@ from src.game_ai import Game_ai
 from src.ai import Ai
 import random
 
-game = Game_ai(True)
+game = Game_ai()
 won = False
 turns = 0   # count turns
 
