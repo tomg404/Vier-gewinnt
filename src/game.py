@@ -1,15 +1,32 @@
 import os
 import sys
 import argparse
+import time
 import numpy as np
+import colorama as c
+from termcolor import cprint
+from pyfiglet import figlet_format
 from . import __version__, __author__
 
 class Game:
     def __init__(self):
+        c.init()    # initialize colorama to make colored output work on windows
+
+        self.verbose = self.parse_args().verbose
+        self.vprint = print if self.verbose else lambda *a, **k: None # thanks to https://stackoverflow.com/a/5980173/10653517 for this solution
+        self.no_color = self.parse_args().no_color
+
+        # toggle colored output
+        if self.no_color:
+            self.player1 = 'X'
+            self.player2 = 'O'
+        else:
+            self.player1 = c.Fore.RED + 'X' + c.Style.RESET_ALL
+            self.player2 = c.Fore.BLUE + 'O' + c.Style.RESET_ALL
+
         self.version = __version__
+        self.sleep_time_at_start = 3
         self.empty = ' '
-        self.player1 = 'X'
-        self.player2 = 'O'
         self.current_player = 1
         self.user_input = 0
         self.field = [[self.empty,self.empty,self.empty,self.empty,self.empty,self.empty,self.empty],
@@ -18,15 +35,25 @@ class Game:
                     [self.empty,self.empty,self.empty,self.empty,self.empty,self.empty,self.empty],
                     [self.empty,self.empty,self.empty,self.empty,self.empty,self.empty,self.empty],
                     [self.empty,self.empty,self.empty,self.empty,self.empty,self.empty,self.empty]]
-        self.verbose = self.parse_args().verbose
+
 
     def parse_args(self):
         parser = argparse.ArgumentParser(description='4 connects game in python', epilog='(c) %s'%__author__)
         parser.add_argument('-v', '--verbose', action='store_true', help='show which win check triggered on win')
+        parser.add_argument('-nc', '--no-color', action='store_true', help='don\'t output color')
         args = parser.parse_args()
         return args
 
     def run(self):
+        self.clear_screen()
+        cprint(figlet_format('4 connects', font='slant'))
+
+        for i in range(self.sleep_time_at_start):
+            sys.stdout.write("Game starting in: %d \r" % (self.sleep_time_at_start - i) )
+            sys.stdout.flush()
+            time.sleep(1)
+
+        self.clear_screen()
         won = False
         while True:
             try:
@@ -40,14 +67,25 @@ class Game:
                     print('You won!')
                     break
             except KeyboardInterrupt:
-                print('Game ended')
+                text = 'Game ended'
+                if self.no_color:
+                    print(text)
+                else:
+                    print(c.Fore.RED + text + c.Style.RESET_ALL)
                 sys.exit()
 
     def print_field(self):
-        print('4 Connects (v%s) (c) Tom Gaimann 2019' % self.version)
-        print('|0|1|2|3|4|5|6|')
+        tabs = '            '
+        credits = ' 4 Connects (v%s) (c) Tom Gaimann 2019 ' % self.version
+        print('╔' + len(credits) * '═' + '╗')
+        print('║' + credits + '║')
+        print('╚' + len(credits) * '═' + '╝')
+
+        print(tabs + '╔═══════════════╗')
+        print(tabs + '║|0|1|2|3|4|5|6|║')
         for i in range(0, 6):
-            print('|{}|{}|{}|{}|{}|{}|{}|'.format(self.field[i][0],self.field[i][1],self.field[i][2],self.field[i][3],self.field[i][4],self.field[i][5],self.field[i][6]))
+            print(tabs + '║|{}|{}|{}|{}|{}|{}|{}|║'.format(self.field[i][0],self.field[i][1],self.field[i][2],self.field[i][3],self.field[i][4],self.field[i][5],self.field[i][6]))
+        print(tabs + '╚═══════════════╝')
 
     def get_user_input(self):
         try:
@@ -99,10 +137,9 @@ class Game:
         v = self._check_win_vertical()
         d = self._check_win_diagonal()
 
-        if self.verbose == True:
-            print("  Linear check: %s" % l)
-            print("Vertical check: %s" % v)
-            print("Diagonal check: %s" % d)
+        self.vprint("  Linear check: %s" % l)
+        self.vprint("Vertical check: %s" % v)
+        self.vprint("Diagonal check: %s" % d)
 
         if l == True or v == True or d == True:
             return True
@@ -166,21 +203,25 @@ class Game:
 
         # check every diagonal from up to down if there are 4 of the same
         if check_array(win_arr):
+            self.vprint('_check_win_diagonal::check_array::1')
             return True
 
         # flip array and again check every diagonal if there are 4 of the same
         win_arr = np.fliplr(win_arr)
         if check_array(win_arr):
+            self.vprint('_check_win_diagonal::check_array::2')
             return True
 
         # flip array upside down
         win_arr = np.flipud(win_arr)
         if check_array(win_arr):
+            self.vprint('_check_win_diagonal::check_array::3')
             return True
 
         # flip array left to right again
         win_arr = np.fliplr(win_arr)
         if check_array(win_arr):
+            self.vprint('_check_win_diagonal::check_array::4')
             return True
 
 
